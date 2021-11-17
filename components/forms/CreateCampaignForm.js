@@ -12,6 +12,7 @@ import {
   Button,
   Box,
 } from "@chakra-ui/react";
+import { useEffect, useMemo } from "react";
 
 export default function CreateCampaignForm(props) {
   const {
@@ -19,21 +20,21 @@ export default function CreateCampaignForm(props) {
     handleSubmit,
     register,
     formState: { errors, isSubmitting },
-  } = useForm();
+  } = useForm({
+    name: "",
+    description: "",
+    threshold: 30,
+  });
+
+  useEffect(() => {
+    register("threshold");
+  });
 
   const onSubmit = (values) => {
     console.log(values);
   };
 
-  // To Fill
-  // - Name
-  // - Description
-  // - Threshold
-  // - Time limit
-  // To Fetch
-  // - User address
-
-  console.log(props?.name);
+  const thresholdLimit = useMemo(() => 30);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -54,7 +55,7 @@ export default function CreateCampaignForm(props) {
       </FormControl>
 
       {/* Description */}
-      <FormControl isInvalid={errors.name}>
+      <FormControl isInvalid={errors.description}>
         <FormLabel htmlFor="campaign-description">
           Campaign Description
         </FormLabel>
@@ -62,43 +63,47 @@ export default function CreateCampaignForm(props) {
           id="campaign-description"
           placeholder="..."
           autoComplete="off"
-          {...register("description", {})}
+          {...register("description")}
         />
         <FormErrorMessage>
-          {errors.name && errors.name.message}
+          {errors.description && errors.description.message}
         </FormErrorMessage>
       </FormControl>
 
-      <FormControl>
+      <FormControl isInvalid={errors?.threshold}>
         <FormLabel htmlFor="campaign-threshold">
           Vote Passed Threshold
         </FormLabel>
         <Controller
           control={control}
+          rules={{
+            min: {
+              value: thresholdLimit,
+              message: `Threshold must greater than or equal ${thresholdLimit}%`,
+            },
+          }}
           name="threshold"
           defaultValue={50}
-          render={({ field: { value, onChange } }) => {
-            return (
-              <Slider
-                aria-label="campaign-threshold"
-                id="campaign-threshold"
-                value={value}
-                min={30}
-                max={100}
-                onChange={onChange}
-              >
-                <SliderTrack>
-                  <SliderFilledTrack />
-                </SliderTrack>
-                <SliderThumb boxSize={6}>{value}</SliderThumb>
-              </Slider>
-            );
-          }}
+          render={({ field }) => (
+            <Slider
+              aria-label="campaign-threshold"
+              id="campaign-threshold"
+              min={0}
+              max={100}
+              {...field}
+            >
+              <SliderTrack>
+                <SliderFilledTrack />
+              </SliderTrack>
+              <SliderThumb boxSize={6}>{field.value}</SliderThumb>
+            </Slider>
+          )}
         ></Controller>
+        <FormErrorMessage>{errors?.threshold?.message}</FormErrorMessage>
       </FormControl>
 
-      <Button isLoading={isSubmitting} type="submit">
-        Submit
+      <Button mt={4} isLoading={isSubmitting} type="submit">
+        Create!
       </Button>
     </form>
   );
