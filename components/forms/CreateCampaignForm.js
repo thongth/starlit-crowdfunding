@@ -10,7 +10,7 @@ import {
   SliderFilledTrack,
   SliderThumb,
   Button,
-  Box,
+  VStack,
 } from "@chakra-ui/react";
 import { useEffect, useMemo } from "react";
 
@@ -38,73 +38,75 @@ export default function CreateCampaignForm(props) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      {/* Name */}
-      <FormControl isInvalid={errors.name}>
-        <FormLabel htmlFor="campaign-name">Campaign Name</FormLabel>
-        <Input
-          id="campaign-name"
-          placeholder="Neo Facebook - a free-tracker social media"
-          autoComplete="off"
-          {...register("name", {
-            required: "This field is required",
-          })}
-        />
-        <FormErrorMessage>
-          {errors.name && errors.name.message}
-        </FormErrorMessage>
-      </FormControl>
+      <VStack align="start" spacing={4}>
+        {/* Name */}
+        <FormControl isInvalid={errors.name}>
+          <FormLabel htmlFor="campaign-name">Campaign Name</FormLabel>
+          <Input
+            id="campaign-name"
+            placeholder="Neo Facebook - a free-tracker social media"
+            autoComplete="off"
+            {...register("name", {
+              required: "This field is required",
+            })}
+          />
+          <FormErrorMessage>
+            {errors.name && errors.name.message}
+          </FormErrorMessage>
+        </FormControl>
 
-      {/* Description */}
-      <FormControl isInvalid={errors.description}>
-        <FormLabel htmlFor="campaign-description">
-          Campaign Description
-        </FormLabel>
-        <Textarea
-          id="campaign-description"
-          placeholder="..."
-          autoComplete="off"
-          {...register("description")}
-        />
-        <FormErrorMessage>
-          {errors.description && errors.description.message}
-        </FormErrorMessage>
-      </FormControl>
+        {/* Description */}
+        <FormControl isInvalid={errors.description}>
+          <FormLabel htmlFor="campaign-description">
+            Campaign Description
+          </FormLabel>
+          <Textarea
+            id="campaign-description"
+            placeholder="..."
+            autoComplete="off"
+            {...register("description")}
+          />
+          <FormErrorMessage>
+            {errors.description && errors.description.message}
+          </FormErrorMessage>
+        </FormControl>
 
-      <FormControl isInvalid={errors?.threshold}>
-        <FormLabel htmlFor="campaign-threshold">
-          Vote Passed Threshold
-        </FormLabel>
-        <Controller
-          control={control}
-          rules={{
-            min: {
-              value: thresholdLimit,
-              message: `Threshold must greater than or equal ${thresholdLimit}%`,
-            },
-          }}
-          name="threshold"
-          defaultValue={50}
-          render={({ field }) => (
-            <Slider
-              aria-label="campaign-threshold"
-              id="campaign-threshold"
-              min={0}
-              max={100}
-              {...field}
-            >
-              <SliderTrack>
-                <SliderFilledTrack />
-              </SliderTrack>
-              <SliderThumb boxSize={6}>{field.value}</SliderThumb>
-            </Slider>
-          )}
-        ></Controller>
-        <FormErrorMessage>{errors?.threshold?.message}</FormErrorMessage>
-      </FormControl>
+        <FormControl isInvalid={errors?.threshold}>
+          <FormLabel htmlFor="campaign-threshold">
+            Vote Passed Threshold
+          </FormLabel>
+          <Controller
+            control={control}
+            rules={{
+              min: {
+                value: thresholdLimit,
+                message: `Threshold must greater than or equal ${thresholdLimit}%`,
+              },
+            }}
+            name="threshold"
+            defaultValue={50}
+            render={({ field }) => (
+              <Slider
+                aria-label="campaign-threshold"
+                id="campaign-threshold"
+                min={0}
+                max={100}
+                {...field}
+              >
+                <SliderTrack>
+                  <SliderFilledTrack />
+                </SliderTrack>
+                <SliderThumb boxSize={6}>{field.value}</SliderThumb>
+              </Slider>
+            )}
+          ></Controller>
+          <FormErrorMessage>{errors?.threshold?.message}</FormErrorMessage>
+        </FormControl>
 
-      <Button mt={4} isLoading={isSubmitting} type="submit">
-        Create!
-      </Button>
+        <Button mt={4} isLoading={isSubmitting} type="submit">
+          Create!
+        </Button>
+      </VStack>
     </form>
   );
 }
