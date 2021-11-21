@@ -115,7 +115,7 @@ contract Campaign{
         currentContribution = 0;
         terminated = false;
         
-        usdt = IERC20(address(0xe14dF5159c6c75eAE5Cc14f93Dd2E4BF970C7Cd8)); //test address
+        usdt = IERC20(address(0xD92E713d051C37EbB2561803a3b5FBAbc4962431)); //TUSDT https://rinkeby.etherscan.io/address/0xD92E713d051C37EbB2561803a3b5FBAbc496243
         //IDateTime dt = IDateTime(address(0x92482Ba45A4D2186DafB486b322C6d0B88410FE7)); //for Datetime Conversion
     }
     
