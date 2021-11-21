@@ -2,7 +2,7 @@ import Head from "next/head";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Box,
@@ -20,6 +20,7 @@ import {
 } from "@chakra-ui/react";
 
 import ContributeForm from "../../../components/forms/ContributeForm";
+import { CampaignContract } from "../../../eth/metamask/Campaign";
 
 const InformationBox = ({ title, subtitle, description }) => {
   return (
@@ -38,12 +39,27 @@ const InformationBox = ({ title, subtitle, description }) => {
 export default function CampaignPage(props) {
   const router = useRouter();
   const { address } = router.query;
+  const [ managerAddress, setManagerAddress ] = useState('')
+  const [ minContrib, setMinContrib ] = useState(0)
+  const [ campaignBalance, setCampaignBalance ] = useState(0)
+  const [ requestNumber, setRequestNumber ] = useState(0)
+  const [ contributorNumber, setContributorNumber ] = useState(0)
 
   const breakpoint = useBreakpoint();
 
   console.log(breakpoint);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    console.log('addresss', address)
+    console.log(CampaignContract(address))
+    CampaignContract(address).getSummary().then(result => {
+      setManagerAddress(result[4])
+      setMinContrib(result[0].toNumber())
+      setCampaignBalance(result[1].toNumber())
+      setRequestNumber(result[2].toNumber())
+      setContributorNumber(result[3].toNumber())
+    })
+  }, []);
 
   return (
     <>
@@ -58,28 +74,28 @@ export default function CampaignPage(props) {
         <GridItem colSpan={3}>
           <SimpleGrid columns={[1, null, 1, 2]} spacing="4">
             <InformationBox
-              title="0xQWEYD1236SL372FJDF730DJH0738HDKDFH"
+              title={managerAddress}
               subtitle="Address of Manager"
               description="Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat."
             />
             <InformationBox
-              title="102"
+              title={minContrib}
               subtitle="Minimum Contribution (Wei)"
               description="Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat."
             />
             <InformationBox
-              title="3"
+              title={requestNumber}
               subtitle="Number of Requests"
               description="Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat."
             />
             <InformationBox
-              title="2"
-              subtitle="Number of Approvers"
+              title={contributorNumber}
+              subtitle="Number of Contributors"
               description="Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat."
             />
             <InformationBox
-              title="0.99999"
-              subtitle="Balance (Ether)"
+              title={campaignBalance}
+              subtitle="Balance (USDT)"
               description="Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat."
             />
           </SimpleGrid>
@@ -88,7 +104,7 @@ export default function CampaignPage(props) {
           </NextLink>
         </GridItem>
         <GridItem colSpan={["sm"].includes(breakpoint) ? 3 : 2}>
-          <ContributeForm />
+          <ContributeForm contractAddress={address}/>
         </GridItem>
       </SimpleGrid>
     </>

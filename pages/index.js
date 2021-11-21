@@ -1,5 +1,6 @@
 import Head from "next/head";
 import NextLink from "next/link";
+import dynamic from 'next/dynamic'
 
 import { useEffect, useState } from "react";
 
@@ -8,15 +9,21 @@ import { AddIcon } from "@chakra-ui/icons";
 import CampaignCard from "../components/card/CampaignCard";
 import FilterSearch from "../components/search/FilterSearch";
 
+// const Contracts = dynamic(
+//   () => import('../eth/metamask/Campaign'),
+//   { ssr: false }
+// )
+
+import { FactoryContract } from "../eth/metamask/Campaign";
+
 export default function Home() {
   const [campaign, setCampaign] = useState([]);
   const [query, setQuery] = useState("");
 
   const handleSearch = (e) => setQuery(e.target.value);
   useEffect(() => {
-    fetch("/api/campaign")
-      .then((response) => response.json())
-      .then((data) => setCampaign(data));
+    console.log(FactoryContract())
+    FactoryContract().getDeployedCampaigns().then(result => {console.log(result); setCampaign(result)})
   }, []);
 
   const renderCampaignList = () => {
@@ -27,7 +34,7 @@ export default function Home() {
       return (
         <SimpleGrid columns={[1, null, null, 2]} spacing="4">
           {result.map((c) => (
-            <CampaignCard key={c.address} address={c.address} />
+            <CampaignCard key={c} address={c} />
           ))}
         </SimpleGrid>
       );

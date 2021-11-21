@@ -21,11 +21,12 @@ import { AddIcon, SearchIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
 
 import RequestItem from "../../../../components/RequestItem";
+import { CampaignContract } from "../../../../eth/metamask/Campaign"
 
 const defaultHeaderList = [
   "ID",
   "Description",
-  "Amount (ether)",
+  "Amount (USDT)",
   "Recipient",
   "Approval",
   "Expire Date",
@@ -44,45 +45,34 @@ export default function RequestPage() {
     description: 1,
   });
   const [result, setResult] = useState([]);
+  const [requestCount, setRequestCount] = useState(0)
 
   useEffect(() => {
     // 1. fetch request list
-    setTimeout(
-      () =>
-        setRequestList([
-          {
-            id: 0,
-            description: "This first request",
-            amount: 0.001,
-            recipient: "0xSDFJHIOWYEKC1238CH385HD",
-            exp: new Date().toLocaleString(),
-            approval: 3,
-            approved: true,
-            completed: true,
-          },
-          {
-            id: 1,
-            description: "This second request",
-            amount: 0.97,
-            recipient: "0xEFHCK342347CKEDLCYERSYG",
-            exp: new Date().toLocaleString(),
-            approval: 2,
-            approved: false,
-            completed: false,
-          },
-          {
-            id: 2,
-            description: "This third request",
-            amount: 0.00001,
-            recipient: "0xSDFEH983D739F60G6YERSYG",
-            exp: new Date().toLocaleString(),
-            approval: 2,
-            approved: true,
-            completed: false,
-          },
-        ]),
-      1000
-    );
+    CampaignContract(address).getRequestsCount().then(result => {
+      const requestCount = result.toNumber()
+      setRequestCount(requestCount)
+      Promise.all(
+        Array(parseInt(requestCount)).fill().map((element, index) => {
+            return CampaignContract(address).requests(index)
+        })
+    ).then(requestList => {
+      setRequestList(requestList.map((request, idx) => {
+        const request = {
+          id: idx,
+          description: request[0],
+          amount: request[1].toNumber(),
+          recipient: request[2],
+          exp: new Date(request[5].toNumber()).toLocaleString(),
+          approval: request[4].toNumber(),
+          approved: false,
+          completed: request[3],
+        }
+        console.log(request)
+        return request
+      }))
+    })
+    })
   }, []);
 
   useEffect(() => {
@@ -114,7 +104,7 @@ export default function RequestPage() {
     ) : (
       <Tr>
         <Td colSpan={headerList.length}>
-          <Text fontSize="lg" textAlign="center">
+          <Text fontSize="lg" textAlign="center" color="white">
             No Result
           </Text>
         </Td>

@@ -14,6 +14,8 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useMemo } from "react";
 
+import { FactoryContract } from "../../eth/metamask/Campaign";
+
 export default function CreateCampaignForm(props) {
   const {
     control,
@@ -31,7 +33,8 @@ export default function CreateCampaignForm(props) {
   });
 
   const onSubmit = (values) => {
-    console.log(values);
+    console.log(values)
+    FactoryContract().createCampaign(values.name, values.description, 10, values.threshold).then(result => {console.log(result)})
   };
 
   const thresholdLimit = useMemo(() => 30);

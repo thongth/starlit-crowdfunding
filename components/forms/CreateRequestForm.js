@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup/dist/yup";
 import * as yup from "yup";
@@ -13,7 +14,11 @@ import {
   VStack,
 } from "@chakra-ui/react";
 
+import { CampaignContract } from '../../eth/metamask/Campaign'
+
 export default function CreateRequestForm(props) {
+  const router = useRouter();
+  const { address } = router.query;
   const schema = yup.object().shape({
     amount: yup
       .number()
@@ -38,6 +43,9 @@ export default function CreateRequestForm(props) {
 
   const onSubmit = (values) => {
     console.log(values);
+    CampaignContract(address).createRequest(values.description, values.amount, values.recipient, values.exp.getTime()).then(result => {
+      console.log('created', result)
+    })
   };
 
   return (
