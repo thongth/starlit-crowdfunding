@@ -115,7 +115,7 @@ contract Campaign{
         currentContribution = 0;
         terminated = false;
         
-        usdt = IERC20(address(0xD92E713d051C37EbB2561803a3b5FBAbc4962431)); //TUSDT https://rinkeby.etherscan.io/address/0xD92E713d051C37EbB2561803a3b5FBAbc496243
+        usdt = IERC20(address(0xD92E713d051C37EbB2561803a3b5FBAbc4962431)); //TUSDT https://rinkeby.etherscan.io/address/0xD92E713d051C37EbB2561803a3b5FBAbc4962431 ### 1 TUSDT = 10**6 ###
         //IDateTime dt = IDateTime(address(0x92482Ba45A4D2186DafB486b322C6d0B88410FE7)); //for Datetime Conversion
     }
     
@@ -198,7 +198,7 @@ contract Campaign{
         require(request.approvalAmount > (totalContribution * votingThreshold/100));
         require(!request.complete);
         
-        if(request.expirationDT <= now){
+        if(request.expirationDT >= now){
             usdt.transfer(request.recipient, request.value);
             currentContribution -= request.value; 
         }
@@ -214,7 +214,7 @@ contract Campaign{
         require(request.approvalAmount > (totalContribution*2/3)); // supermajority vote
         require(!request.complete);
         
-        if(request.expirationDT <= now){
+        if(request.expirationDT >= now){
             //distribute money back
             uint tempContribution = currentContribution;
             for(uint8 i=0; i<=approversCount; i++){
