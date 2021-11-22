@@ -11,7 +11,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 
-import { USDTContract } from '../../eth/metamask/USDT';
+import { makeItMillion, USDTContract } from '../../eth/metamask/USDT';
 import { CampaignContract } from '../../eth/metamask/Campaign';
 
 const ContributeForm = ({ contractAddress }) => {
@@ -26,12 +26,12 @@ const ContributeForm = ({ contractAddress }) => {
     console.log(values);
     if (!isApproved) {
       console.log('usdt contract', USDTContract().address)
-      USDTContract().approve(contractAddress, values.amount).then(result => {
+      USDTContract().approve(contractAddress, makeItMillion(values.amount)).then(result => {
         console.log(result)
         setApproved(true)
       })
     } else {
-      CampaignContract(contractAddress).contribute(values.amount).then(result => {
+      CampaignContract(contractAddress).contribute(makeItMillion(values.amount)).then(result => {
         console.log(result)
       })
     }

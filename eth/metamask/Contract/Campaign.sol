@@ -271,7 +271,7 @@ contract Campaign {
                 ((totalContribution * votingThreshold) / 100)
         );
         require(!request.complete);
-
+        // require(request.expirationDT >= now);
         if (request.expirationDT >= now) {
             usdt.transfer(request.recipient, request.value);
             currentContribution -= request.value;

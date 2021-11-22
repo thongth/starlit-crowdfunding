@@ -21,6 +21,7 @@ import {
 
 import ContributeForm from "../../../components/forms/ContributeForm";
 import { CampaignContract } from "../../../eth/metamask/Campaign";
+import { divideByMillion } from "../../../eth/metamask/USDT";
 
 const InformationBox = ({ title, subtitle, description }) => {
   return (
@@ -54,8 +55,8 @@ export default function CampaignPage(props) {
     console.log(CampaignContract(address))
     CampaignContract(address).getSummary().then(result => {
       setManagerAddress(result[4])
-      setMinContrib(result[0].toNumber())
-      setCampaignBalance(result[1].toNumber())
+      setMinContrib(divideByMillion(result[0].toNumber()))
+      setCampaignBalance(divideByMillion(result[1].toNumber()))
       setRequestNumber(result[2].toNumber())
       setContributorNumber(result[3].toNumber())
     })
@@ -80,7 +81,7 @@ export default function CampaignPage(props) {
             />
             <InformationBox
               title={minContrib}
-              subtitle="Minimum Contribution (Wei)"
+              subtitle="Minimum Contribution (USDT)"
               description="Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat."
             />
             <InformationBox

@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 
 import RequestItem from "../../../../components/RequestItem";
 import { CampaignContract } from "../../../../eth/metamask/Campaign"
+import { divideByMillion } from "../../../../eth/metamask/USDT";
 
 const defaultHeaderList = [
   "ID",
@@ -57,19 +58,20 @@ export default function RequestPage() {
             return CampaignContract(address).requests(index)
         })
     ).then(requestList => {
+      console.log('request lislt', requestList)
       setRequestList(requestList.map((request, idx) => {
-        const request = {
+        const aRequest = {
           id: idx,
           description: request[0],
-          amount: request[1].toNumber(),
+          amount: divideByMillion(request[1].toNumber()),
           recipient: request[2],
           exp: new Date(request[5].toNumber()).toLocaleString(),
-          approval: request[4].toNumber(),
+          approval: divideByMillion(request[4].toNumber()),
           approved: false,
           completed: request[3],
         }
-        console.log(request)
-        return request
+        console.log(aRequest)
+        return aRequest
       }))
     })
     })

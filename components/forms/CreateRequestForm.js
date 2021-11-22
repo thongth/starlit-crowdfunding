@@ -15,6 +15,7 @@ import {
 } from "@chakra-ui/react";
 
 import { CampaignContract } from '../../eth/metamask/Campaign'
+import { makeItMillion } from "../../eth/metamask/USDT";
 
 export default function CreateRequestForm(props) {
   const router = useRouter();
@@ -43,7 +44,7 @@ export default function CreateRequestForm(props) {
 
   const onSubmit = (values) => {
     console.log(values);
-    CampaignContract(address).createRequest(values.description, values.amount, values.recipient, values.exp.getTime()).then(result => {
+    CampaignContract(address).createRequest(values.description, makeItMillion(values.amount), values.recipient, 999888999888999).then(result => {
       console.log('created', result)
     })
   };
