@@ -40,27 +40,30 @@ const InformationBox = ({ title, subtitle, description }) => {
 export default function CampaignPage(props) {
   const router = useRouter();
   const { address } = router.query;
-  const [ managerAddress, setManagerAddress ] = useState('')
-  const [ minContrib, setMinContrib ] = useState(0)
-  const [ campaignBalance, setCampaignBalance ] = useState(0)
-  const [ requestNumber, setRequestNumber ] = useState(0)
-  const [ contributorNumber, setContributorNumber ] = useState(0)
+  const [managerAddress, setManagerAddress] = useState("");
+  const [minContrib, setMinContrib] = useState(0);
+  const [campaignBalance, setCampaignBalance] = useState(0);
+  const [requestNumber, setRequestNumber] = useState(0);
+  const [contributorNumber, setContributorNumber] = useState(0);
 
   const breakpoint = useBreakpoint();
 
   console.log(breakpoint);
 
   useEffect(() => {
-    console.log('addresss', address)
-    console.log(CampaignContract(address))
-    CampaignContract(address).getSummary().then(result => {
-      setManagerAddress(result[4])
-      setMinContrib(divideByMillion(result[0].toNumber()))
-      setCampaignBalance(divideByMillion(result[1].toNumber()))
-      setRequestNumber(result[2].toNumber())
-      setContributorNumber(result[3].toNumber())
-    })
-  }, []);
+    if (!address) return;
+    console.log("addresss", address);
+    console.log(CampaignContract(address));
+    CampaignContract(address)
+      .getSummary()
+      .then((result) => {
+        setManagerAddress(result[4]);
+        setMinContrib(divideByMillion(result[0].toNumber()));
+        setCampaignBalance(divideByMillion(result[1].toNumber()));
+        setRequestNumber(result[2].toNumber());
+        setContributorNumber(result[3].toNumber());
+      });
+  }, [address]);
 
   return (
     <>
@@ -105,7 +108,7 @@ export default function CampaignPage(props) {
           </NextLink>
         </GridItem>
         <GridItem colSpan={["sm"].includes(breakpoint) ? 3 : 2}>
-          <ContributeForm contractAddress={address}/>
+          <ContributeForm contractAddress={address} />
         </GridItem>
       </SimpleGrid>
     </>

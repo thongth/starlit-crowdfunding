@@ -1,3 +1,4 @@
+import { useRouter } from "";
 import { useForm, Controller } from "react-hook-form";
 import {
   FormErrorMessage,
@@ -16,7 +17,7 @@ import { useEffect, useMemo } from "react";
 
 import { FactoryContract } from "../../eth/metamask/Campaign";
 
-export default function CreateCampaignForm(props) {
+export default function CreateCampaignForm() {
   const {
     control,
     handleSubmit,
@@ -28,13 +29,20 @@ export default function CreateCampaignForm(props) {
     threshold: 30,
   });
 
+  const router = useRouter();
+
   useEffect(() => {
     register("threshold");
-  });
+  }, []);
 
   const onSubmit = (values) => {
-    console.log(values)
-    FactoryContract().createCampaign(values.name, values.description, 10, values.threshold).then(result => {console.log(result)})
+    console.log(values);
+    FactoryContract()
+      .createCampaign(values.name, values.description, 10, values.threshold)
+      .then((result) => {
+        console.log(result);
+        router.push(`/`);
+      });
   };
 
   const thresholdLimit = useMemo(() => 30);
