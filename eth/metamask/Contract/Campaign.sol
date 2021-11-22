@@ -90,6 +90,9 @@ contract Campaign{
     
     // === Methods ===
     
+    event TransferToken(address _to, uint _amount);
+    event EmitNow(uint256 _now);
+    
     // == Modifier ==
     modifier authorization(){
         require(msg.sender == manager);
@@ -104,7 +107,7 @@ contract Campaign{
     // == constructor ==
     //Setting the manager and minimum amount to contribute
     constructor(string _name, string _description, uint minimum, uint threshold, address creator) public {
-        require(threshold > 30, "Threshold can't be lower than 30%");
+        require(threshold >= 30, "Threshold can't be lower than 30%");
         require(threshold <= 100, "Threshold can't be higher than 100%");
         name = _name;
         description = _description;
@@ -169,9 +172,9 @@ contract Campaign{
     function approveRequest(uint index) public Terminable{
         Request storage request = requests[index];
         
-        require(approvers[msg.sender]);
-        require(!request.approvals[msg.sender]);
-        require(!request.complete);
+        require(approvers[msg.sender], "You are not a contributor!");
+        require(!request.approvals[msg.sender], "You already voted!");
+        require(!request.complete, "Request is already completed!");
         require(request.expirationDT > now, "The request has expired.");
         
         request.approvals[msg.sender] = true;
@@ -182,9 +185,9 @@ contract Campaign{
     function approveTerminationRequest(uint index) public Terminable{
         TerminationRequest storage request = terminationRequests[index];
         
-        require(approvers[msg.sender]);
-        require(!request.approvals[msg.sender]);
-        require(!request.complete);
+        require(approvers[msg.sender], "You are not a contributor!");
+        require(!request.approvals[msg.sender], "You already voted!");
+        require(!request.complete, "Request is already completed!");
         require(request.expirationDT > now, "The request has expired.");
         
         request.approvals[msg.sender] = true;
@@ -195,12 +198,13 @@ contract Campaign{
     function finalizeRequest(uint index) public authorization Terminable{
         Request storage request = requests[index];
         
-        require(request.approvalAmount > (totalContribution * votingThreshold/100));
-        require(!request.complete);
+        require(request.approvalAmount > (totalContribution * votingThreshold/100), "Not enough votes for this request!");
+        require(!request.complete, "Request is already completed.");
         
         if(request.expirationDT >= now){
             usdt.transfer(request.recipient, request.value);
-            currentContribution -= request.value; 
+            currentContribution -= request.value;
+            emit TransferToken(request.recipient, request.value);
         }
         
         request.complete = true;
@@ -211,8 +215,8 @@ contract Campaign{
     function finalizeTerrminationRequest(uint index) public Terminable{
         TerminationRequest storage request = terminationRequests[index];
         
-        require(request.approvalAmount > (totalContribution*2/3)); // supermajority vote
-        require(!request.complete);
+        require(request.approvalAmount > (totalContribution*2/3), "Not enough votes for this request!"); // supermajority vote
+        require(!request.complete, "Request is already completed.");
         
         if(request.expirationDT >= now){
             //distribute money back
