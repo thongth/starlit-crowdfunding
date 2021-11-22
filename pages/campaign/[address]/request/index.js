@@ -21,8 +21,12 @@ import { AddIcon, SearchIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
 
 import RequestItem from "../../../../components/RequestItem";
-import { CampaignContract } from "../../../../eth/metamask/Campaign"
+import ErrorAlert from "../../../../components/alert/ErrorAlert";
+
+import { CampaignContract } from "../../../../eth/metamask/Campaign";
 import { divideByMillion } from "../../../../eth/metamask/USDT";
+
+import { ErrorContext } from "../../../../context/error-context";
 
 const defaultHeaderList = [
   "ID",
@@ -38,44 +42,57 @@ const defaultHeaderList = [
 export default function RequestPage() {
   const router = useRouter();
   const { address } = router.query;
-  const [headerList, setHeaderList] = useState(defaultHeaderList);
-  const [requestList, setRequestList] = useState([]);
 
+  // Table State
   const [query, setQuery] = useState("");
-  const [filters, setFilters] = useState({
+  const [requestList, setRequestList] = useState([]);
+  const [filters] = useState({
     description: 1,
   });
   const [result, setResult] = useState([]);
-  const [requestCount, setRequestCount] = useState(0)
+
+  const [headerList] = useState(defaultHeaderList);
+
+  // Ether State
+  const [, setRequestCount] = useState(0);
+
+  // Error State
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    // 1. fetch request list
-    CampaignContract(address).getRequestsCount().then(result => {
-      const requestCount = result.toNumber()
-      setRequestCount(requestCount)
-      Promise.all(
-        Array(parseInt(requestCount)).fill().map((element, index) => {
-            return CampaignContract(address).requests(index)
-        })
-    ).then(requestList => {
-      console.log('request lislt', requestList)
-      setRequestList(requestList.map((request, idx) => {
-        const aRequest = {
-          id: idx,
-          description: request[0],
-          amount: divideByMillion(request[1].toNumber()),
-          recipient: request[2],
-          exp: new Date(request[5].toNumber()).toLocaleString(),
-          approval: divideByMillion(request[4].toNumber()),
-          approved: false,
-          completed: request[3],
-        }
-        console.log(aRequest)
-        return aRequest
-      }))
-    })
-    })
-  }, []);
+    if (!address) return;
+    CampaignContract(address)
+      .getRequestsCount()
+      .then((result) => {
+        const requestCount = result.toNumber();
+        setRequestCount(requestCount);
+        Promise.all(
+          Array(parseInt(requestCount))
+            .fill()
+            .map((element, index) => {
+              return CampaignContract(address).requests(index);
+            })
+        ).then((requestList) => {
+          console.log("request lislt", requestList);
+          setRequestList(
+            requestList.map((request, idx) => {
+              const aRequest = {
+                id: idx,
+                description: request[0],
+                amount: divideByMillion(request[1].toNumber()),
+                recipient: request[2],
+                exp: new Date(request[5].toNumber()).toLocaleString(),
+                approval: divideByMillion(request[4].toNumber()),
+                approved: false,
+                completed: request[3],
+              };
+              console.log(aRequest);
+              return aRequest;
+            })
+          );
+        });
+      });
+  }, [address]);
 
   useEffect(() => {
     if (!query.length) {
@@ -115,31 +132,34 @@ export default function RequestPage() {
 
   return (
     <>
-      <Flex>
-        <NextLink href={{ pathname: "request/new", query: { address } }}>
-          <Button colorScheme="teal" ml="auto">
-            Create <AddIcon ml={2} />
-          </Button>
-        </NextLink>
-      </Flex>
-      <Box my={4}>
-        <InputGroup>
-          <Input
-            placeholder="Search by Description..."
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <InputAddon children={<Text>Requests</Text>} />
-          <InputRightAddon children={<SearchIcon />} />
-        </InputGroup>
-      </Box>
-      {/* Table */}
-      <Table variant="simple">
-        <TableCaption>Requests of The Campaign</TableCaption>
-        <Thead>
-          <Tr>{renderTableHeader()}</Tr>
-        </Thead>
-        <Tbody>{renderTableBody()}</Tbody>
-      </Table>
+      <ErrorContext.Provider value={{ error, setError }}>
+        <ErrorAlert />
+        <Flex>
+          <NextLink href={{ pathname: "request/new", query: { address } }}>
+            <Button colorScheme="teal" ml="auto">
+              Create <AddIcon ml={2} />
+            </Button>
+          </NextLink>
+        </Flex>
+        <Box my={4}>
+          <InputGroup>
+            <Input
+              placeholder="Search by Description..."
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <InputAddon children={<Text>Requests</Text>} />
+            <InputRightAddon children={<SearchIcon />} />
+          </InputGroup>
+        </Box>
+        {/* Table */}
+        <Table variant="simple" size="sm">
+          <TableCaption>Requests of The Campaign</TableCaption>
+          <Thead>
+            <Tr>{renderTableHeader()}</Tr>
+          </Thead>
+          <Tbody>{renderTableBody()}</Tbody>
+        </Table>
+      </ErrorContext.Provider>
     </>
   );
 }

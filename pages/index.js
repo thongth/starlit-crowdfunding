@@ -1,6 +1,6 @@
 import Head from "next/head";
 import NextLink from "next/link";
-import dynamic from 'next/dynamic'
+import dynamic from "next/dynamic";
 
 import { useEffect, useState } from "react";
 
@@ -15,6 +15,7 @@ import FilterSearch from "../components/search/FilterSearch";
 // )
 
 import { FactoryContract } from "../eth/metamask/Campaign";
+import { connectWallet } from "../eth/metamask";
 
 export default function Home() {
   const [campaign, setCampaign] = useState([]);
@@ -22,8 +23,14 @@ export default function Home() {
 
   const handleSearch = (e) => setQuery(e.target.value);
   useEffect(() => {
-    console.log(FactoryContract())
-    FactoryContract().getDeployedCampaigns().then(result => {console.log(result); setCampaign(result)})
+    connectWallet();
+    console.log(FactoryContract());
+    FactoryContract()
+      .getDeployedCampaigns()
+      .then((result) => {
+        console.log(result);
+        setCampaign(result);
+      });
   }, []);
 
   const renderCampaignList = () => {
