@@ -1,4 +1,5 @@
 import {useState} from 'react'
+import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
 import {
   VStack,
@@ -16,6 +17,9 @@ import { CampaignContract } from '../../eth/metamask/Campaign';
 
 const ContributeForm = ({ contractAddress }) => {
   const [isApproved, setApproved] = useState(false)
+  const [isApproving, setApproving] = useState(false)
+  const [isContributing, setContributing] = useState(false)
+  const router = useRouter()
   const {
     handleSubmit,
     register,
@@ -26,13 +30,32 @@ const ContributeForm = ({ contractAddress }) => {
     console.log(values);
     if (!isApproved) {
       console.log('usdt contract', USDTContract().address)
-      USDTContract().approve(contractAddress, makeItMillion(values.amount)).then(result => {
-        console.log(result)
-        setApproved(true)
+      USDTContract().approve(contractAddress, makeItMillion(values.amount)).then((result) => {
+        console.log("approved", result);
+        setApproving(true)
+        result.wait().then(receipt => {
+          console.log(receipt)
+          setApproving(false)
+          if (receipt.status) {
+            setApproved(true)
+          } else {
+            console.log('fail')
+          }
+        })
       })
     } else {
-      CampaignContract(contractAddress).contribute(makeItMillion(values.amount)).then(result => {
-        console.log(result)
+      CampaignContract(contractAddress).contribute(makeItMillion(values.amount)).then((result) => {
+        console.log("contributed", result);
+        setContributing(true)
+        result.wait().then(receipt => {
+          console.log(receipt)
+          setContributing(false)
+          if (receipt.status) {
+            router.reload()
+          } else {
+            console.log('fail')
+          }
+        })
       })
     }
   };
@@ -60,7 +83,7 @@ const ContributeForm = ({ contractAddress }) => {
             {errors.amount && errors.amount.message}
           </FormErrorMessage>
         </FormControl>
-          <Button type="submit" isLoading={isSubmitting} mt={4}>
+          <Button type="submit" isLoading={isSubmitting | isApproving | isContributing} mt={4}>
             {isApproved ? 'Contrubute!' : 'Approve USDT'}
           </Button>
       </VStack>

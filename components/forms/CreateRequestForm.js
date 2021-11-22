@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup/dist/yup";
@@ -20,6 +21,8 @@ import { makeItMillion } from "../../eth/metamask/USDT";
 export default function CreateRequestForm(props) {
   const router = useRouter();
   const { address } = router.query;
+
+  const [ isCreating, setCreating ] = useState(false)
   const schema = yup.object().shape({
     amount: yup
       .number()
@@ -49,15 +52,21 @@ export default function CreateRequestForm(props) {
         values.description,
         makeItMillion(values.amount),
         values.recipient,
-        999888999888999
+        values.exp.getTime()
       )
       .then((result) => {
         console.log("created", result);
-        router.push(`/campaign/${address}/request`);
+        setCreating(true)
+        result.wait().then(receipt => {
+          console.log(receipt)
+          setCreating(false)
+          if (receipt.status) {
+            router.push(`/campaign/${address}/request`);
+          } else {
+            console.log('fail')
+          }
+        })
       })
-      .catch((err) => {
-        setError(err);
-      });
   };
 
   return (
@@ -73,7 +82,7 @@ export default function CreateRequestForm(props) {
               autoComplete="off"
               {...register("amount")}
             />
-            <InputRightAddon children="ether" />
+            <InputRightAddon children="USDT" />
           </InputGroup>
           <FormErrorMessage>{errors?.amount?.message}</FormErrorMessage>
         </FormControl>
@@ -113,7 +122,7 @@ export default function CreateRequestForm(props) {
           />
           <FormErrorMessage>{errors?.exp?.message}</FormErrorMessage>
         </FormControl>
-        <Button mt={4} isLoading={isSubmitting} type="submit">
+        <Button mt={4} isLoading={isSubmitting || isCreating} type="submit">
           Create!
         </Button>
       </VStack>

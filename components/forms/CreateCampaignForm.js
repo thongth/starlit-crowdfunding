@@ -1,4 +1,5 @@
-import { useRouter } from "";
+import { useState } from 'react'
+import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
 import {
   FormErrorMessage,
@@ -18,6 +19,7 @@ import { useEffect, useMemo } from "react";
 import { FactoryContract } from "../../eth/metamask/Campaign";
 
 export default function CreateCampaignForm() {
+  const [isCreating, setCreating] = useState(false)
   const {
     control,
     handleSubmit,
@@ -40,9 +42,18 @@ export default function CreateCampaignForm() {
     FactoryContract()
       .createCampaign(values.name, values.description, 10, values.threshold)
       .then((result) => {
-        console.log(result);
-        router.push(`/`);
-      });
+        console.log("created", result);
+        setCreating(true)
+        result.wait().then(receipt => {
+          console.log(receipt)
+          setCreating(false)
+          if (receipt.status) {
+            router.push(`/`);
+          } else {
+            console.log('fail')
+          }
+        })
+      })
   };
 
   const thresholdLimit = useMemo(() => 30);
@@ -114,7 +125,7 @@ export default function CreateCampaignForm() {
           <FormErrorMessage>{errors?.threshold?.message}</FormErrorMessage>
         </FormControl>
 
-        <Button mt={4} isLoading={isSubmitting} type="submit">
+        <Button mt={4} isLoading={isSubmitting || isCreating} type="submit">
           Create!
         </Button>
       </VStack>

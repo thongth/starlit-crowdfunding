@@ -80,27 +80,27 @@ export default function CampaignPage(props) {
             <InformationBox
               title={managerAddress}
               subtitle="Address of Manager"
-              description="Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat."
+              description=""
             />
             <InformationBox
               title={minContrib}
               subtitle="Minimum Contribution (USDT)"
-              description="Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat."
+              description=""
             />
             <InformationBox
               title={requestNumber}
               subtitle="Number of Requests"
-              description="Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat."
+              description=""
             />
             <InformationBox
               title={contributorNumber}
               subtitle="Number of Contributors"
-              description="Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat."
+              description=""
             />
             <InformationBox
               title={campaignBalance}
               subtitle="Balance (USDT)"
-              description="Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat."
+              description=""
             />
           </SimpleGrid>
           <NextLink href={`${address}/request`}>
