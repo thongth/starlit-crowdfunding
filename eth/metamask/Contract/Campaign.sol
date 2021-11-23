@@ -274,9 +274,13 @@ contract Campaign {
 
     function withdrawAfterTeminated() public {
         require(terminated, "The project hasn't terminated yet.");
-        require(approvers[msg.sender], "You are not a contributor/already withdrew the fund!");
+        require(
+            approvers[msg.sender],
+            "You are not a contributor/already withdrew the fund!"
+        );
         uint256 contribution = contributions[msg.sender];
-        uint256 refundAmount = (contribution / totalContribution) * contributionAtTermination;
+        uint256 refundAmount = (contribution / totalContribution) *
+            contributionAtTermination;
 
         if (refundAmount <= currentContribution) {
             usdt.transfer(msg.sender, refundAmount);
@@ -371,6 +375,11 @@ contract Campaign {
     // returing no of requests
     function getRequestsCount() public view returns (uint256) {
         return requests.length;
+    }
+
+    // returing no of termination requests
+    function getTerminationRequestsCount() public view returns (uint256) {
+        return terminationRequests.length;
     }
 
     function isApprove(uint256 index) public view returns (bool) {
