@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import { useState } from "react";
 import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
 import {
@@ -10,69 +10,75 @@ import {
   InputGroup,
   InputRightAddon,
   Button,
-  useToast
+  useToast,
 } from "@chakra-ui/react";
 
-import { makeItMillion, USDTContract } from '../../eth/metamask/USDT';
-import { CampaignContract } from '../../eth/metamask/Campaign';
+import { makeItMillion, USDTContract } from "../../eth/metamask/USDT";
+import { CampaignContract } from "../../eth/metamask/Campaign";
 
 const ContributeForm = ({ contractAddress }) => {
-  const [isApproved, setApproved] = useState(false)
-  const [isApproving, setApproving] = useState(false)
-  const [isContributing, setContributing] = useState(false)
-  const router = useRouter()
+  const [isApproved, setApproved] = useState(false);
+  const [isApproving, setApproving] = useState(false);
+  const [isContributing, setContributing] = useState(false);
+  const router = useRouter();
   const {
     handleSubmit,
     register,
     formState: { errors, isSubmitting },
   } = useForm();
-  const toast = useToast()
+  const toast = useToast();
 
   const onSubmit = (values) => {
     console.log(values);
     if (!isApproved) {
-      console.log('usdt contract', USDTContract().address)
-      USDTContract().approve(contractAddress, makeItMillion(values.amount)).then((result) => {
-        console.log("approved", result);
-        setApproving(true)
-        result.wait().then(receipt => {
-          console.log(receipt)
-          setApproving(false)
-          if (receipt.status) {
-            setApproved(true)
-          } else {
-            console.log('fail')
-          }
+      console.log("usdt contract", USDTContract().address);
+      USDTContract()
+        .approve(contractAddress, makeItMillion(values.amount))
+        .then((result) => {
+          console.log("approved", result);
+          setApproving(true);
+          result.wait().then((receipt) => {
+            console.log(receipt);
+            setApproving(false);
+            if (receipt.status) {
+              setApproved(true);
+            } else {
+              console.log("fail");
+            }
+          });
         })
-      }).catch((err) => {
-        toast({
-          title: `${err.error?.message || err.message}`,
-          position: 'bottom',
-          isClosable: true,
-          status: 'error'
-        })
-      });
+        .catch((err) => {
+          toast({
+            title: `${err.error?.message || err.message}`,
+            position: "bottom",
+            isClosable: true,
+            status: "error",
+          });
+        });
     } else {
-      CampaignContract(contractAddress).contribute(makeItMillion(values.amount)).then((result) => {
-        console.log("contributed", result);
-        setContributing(true)
-        result.wait().then(receipt => {
-          console.log(receipt)
-          setContributing(false)
-          if (receipt.status) {
-            router.reload()
-          } else {
-            console.log('fail')
-          }
+      CampaignContract(contractAddress)
+        .contribute(makeItMillion(values.amount))
+        .then((result) => {
+          console.log("contributed", result);
+          setContributing(true);
+          result.wait().then((receipt) => {
+            console.log(receipt);
+            setContributing(false);
+            if (receipt.status) {
+              router.reload();
+            } else {
+              console.log("fail");
+            }
+          });
         })
-      }).catch((err) => {
-        toast({
-          title: `${err.error?.message || err.message}`,
-          position: 'bottom',
-          isClosable: true,
-          status: 'error'
-        })
-      });
+        .catch((err) => {
+          toast({
+            title: `${err.error?.message || err.message}`,
+            position: "bottom",
+            isClosable: true,
+            status: "error",
+          });
+        });
     }
   };
 
@@ -99,9 +105,13 @@ const ContributeForm = ({ contractAddress }) => {
             {errors.amount && errors.amount.message}
           </FormErrorMessage>
         </FormControl>
-          <Button type="submit" isLoading={isSubmitting | isApproving | isContributing} mt={4}>
-            {isApproved ? 'Contrubute!' : 'Approve USDT'}
-          </Button>
+        <Button
+          type="submit"
+          isLoading={isSubmitting || isApproving || isContributing}
+          mt={4}
+        >
+          {isApproved ? "Contrubute!" : "Approve USDT"}
+        </Button>
       </VStack>
     </form>
   );

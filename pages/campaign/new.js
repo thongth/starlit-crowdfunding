@@ -2,6 +2,7 @@ import Head from "next/head";
 import { Heading, Flex, Box, Spacer } from "@chakra-ui/react";
 
 import CreateCampaignForm from "../../components/forms/CreateCampaignForm";
+import ErrorAlert from "../../components/alert/ErrorAlert";
 
 export default function NewCampaignPage() {
   return (
@@ -12,6 +13,7 @@ export default function NewCampaignPage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+      <ErrorAlert />
       <Heading as="h1" mb={4}>
         Create New Campaign
       </Heading>
@@ -20,7 +22,6 @@ export default function NewCampaignPage() {
         <Box flex={1}>
           <CreateCampaignForm />
         </Box>
-        <Spacer></Spacer>
       </Flex>
     </>
   );

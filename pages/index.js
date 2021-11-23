@@ -28,19 +28,18 @@ export default function Home() {
     FactoryContract()
       .getDeployedCampaigns()
       .then((addresses) => {
-        console.log('address', addresses);
+        console.log("address", addresses);
         Promise.all(
-          addresses
-            .map((address, index) => {
-              return CampaignContract(address).name();
-            })
+          addresses.map((address, index) => {
+            return CampaignContract(address).name();
+          })
         ).then((names) => {
           setCampaign(
             names.map((name, idx) => {
               return {
                 address: addresses[idx],
-                name: name
-              }
+                name: name,
+              };
             })
           );
         });
@@ -49,7 +48,10 @@ export default function Home() {
 
   const renderCampaignList = () => {
     const result = campaign.filter(
-      (c) => query === "" || c.address.toLowerCase().indexOf(query.toLowerCase()) !== -1 || c.name.toLowerCase().indexOf(query.toLowerCase()) !== -1
+      (c) =>
+        query === "" ||
+        c.address.toLowerCase().indexOf(query.toLowerCase()) !== -1 ||
+        c.name.toLowerCase().indexOf(query.toLowerCase()) !== -1
     );
     if (result.length > 0)
       return (
