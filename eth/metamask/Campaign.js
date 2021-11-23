@@ -9,7 +9,7 @@ export const CampaignContract = (address) => {
 
 export const FactoryContract = () =>
   new ethers.Contract(
-    "0x942d2Dc5e42a784ee0cA3b1Ce487A7Fa2BEb1a19",
+    "0x80AADAE8B95f614E1a0BEafCe0EF93A3d6e5CB9d",
     JSON.parse(CampaignFactory.interface),
     signer
   );

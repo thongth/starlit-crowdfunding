@@ -10,6 +10,7 @@ import {
   InputGroup,
   InputRightAddon,
   Button,
+  useToast
 } from "@chakra-ui/react";
 
 import { makeItMillion, USDTContract } from '../../eth/metamask/USDT';
@@ -25,6 +26,7 @@ const ContributeForm = ({ contractAddress }) => {
     register,
     formState: { errors, isSubmitting },
   } = useForm();
+  const toast = useToast()
 
   const onSubmit = (values) => {
     console.log(values);
@@ -42,7 +44,14 @@ const ContributeForm = ({ contractAddress }) => {
             console.log('fail')
           }
         })
-      })
+      }).catch((err) => {
+        toast({
+          title: `${err.error?.message || err.message}`,
+          position: 'bottom',
+          isClosable: true,
+          status: 'error'
+        })
+      });
     } else {
       CampaignContract(contractAddress).contribute(makeItMillion(values.amount)).then((result) => {
         console.log("contributed", result);
@@ -56,7 +65,14 @@ const ContributeForm = ({ contractAddress }) => {
             console.log('fail')
           }
         })
-      })
+      }).catch((err) => {
+        toast({
+          title: `${err.error?.message || err.message}`,
+          position: 'bottom',
+          isClosable: true,
+          status: 'error'
+        })
+      });
     }
   };
 

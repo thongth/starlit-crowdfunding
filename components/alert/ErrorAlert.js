@@ -21,9 +21,9 @@ const ErrorAlert = () => {
         <Alert borderRadius="md" shadow="md" my={4} status="error">
           <AlertIcon w={8} h={8} />
           <Box>
-            <AlertTitle>{error?.code}</AlertTitle>
+            <AlertTitle>{error?.error?.code || error?.code}</AlertTitle>
             <AlertDescription display="flex">
-              <Text wordBreak="break-all">{error?.message}</Text>
+              <Text wordBreak="break-all">{error?.error?.message || error?.message}</Text>
             </AlertDescription>
           </Box>
           <CloseButton

@@ -1,27 +1,41 @@
-import { Tr, Td, Button, Text } from "@chakra-ui/react";
+import { useState } from 'react'
+import { Tr, Td, Button, Text, useToast } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useContext } from "react";
-
-import { ErrorContext } from "../context/error-context";
 
 import { CampaignContract } from "../eth/metamask/Campaign";
 
-const RequestItem = ({ req }) => {
+const RequestItem = ({ req, approvalThreshold="" }) => {
+  const [ isApproving, setApproving ] = useState(false)
+  const [ isFinalizing, setFinalizing ] = useState(false)
   const router = useRouter();
   const { address } = router.query;
   const color = req.completed ? "gray.300" : "gray.700";
 
-  const { error, setError } = useContext(ErrorContext);
+  const toast = useToast()
 
   const onApprove = () => {
     CampaignContract(address)
       .approveRequest(req.id)
       .then((result) => {
-        console.log(result);
+        console.log("approved", result);
+        setApproving(true)
+        result.wait().then(receipt => {
+          console.log(receipt)
+          setApproving(false)
+          if (receipt.status) {
+            router.reload()
+          } else {
+            console.log('fail')
+          }
+        })
       })
       .catch((err) => {
-        console.error(err);
-        setError(err);
+        toast({
+          title: `${err.error?.message || err.message}`,
+          position: 'bottom',
+          isClosable: true,
+          status: 'error'
+        })
       });
   };
 
@@ -29,38 +43,54 @@ const RequestItem = ({ req }) => {
     CampaignContract(address)
       .finalizeRequest(req.id)
       .then((result) => {
-        console.log(result);
+        console.log("finalized", result);
+        setFinalizing(true)
+        result.wait().then(receipt => {
+          console.log(receipt)
+          setFinalizing(false)
+          if (receipt.status) {
+            router.reload()
+          } else {
+            console.log('fail')
+          }
+        })
       })
       .catch((err) => {
-        setError(err);
+        toast({
+          title: `${err.error?.message || err.message}`,
+          position: 'bottom',
+          isClosable: true,
+          status: 'error'
+        })
       });
   };
 
   return (
     <Tr key={req.id}>
       <Td>
-        <Text color={color}>{req.id}</Text>
+        <Text >{req.id}</Text>
       </Td>
       <Td>
-        <Text color={color}>{req.description}</Text>
+        <Text >{req.description}</Text>
       </Td>
       <Td>
-        <Text color={color}>{req.amount}</Text>
+        <Text >{req.amount}</Text>
       </Td>
       <Td>
-        <Text isTruncated color={color}>
+        <Text isTruncated >
           {req.recipient}
         </Text>
       </Td>
       <Td>
-        <Text color={color}>{req.approval}</Text>
+        <Text >{`${req.approval}/${approvalThreshold}`}</Text>
       </Td>
       <Td>
-        <Text color={color}>{req.exp}</Text>
+        <Text >{req.exp}</Text>
       </Td>
       <Td>
         <Button
-          disabled={req.approved}
+        isLoading={isApproving}
+          disabled={req.approved | req.completed}
           colorScheme="teal"
           variant="outline"
           onClick={onApprove}
@@ -70,6 +100,7 @@ const RequestItem = ({ req }) => {
       </Td>
       <Td>
         <Button
+        isLoading={isFinalizing}
           disabled={req.completed}
           colorScheme="blue"
           variant="outline"

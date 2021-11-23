@@ -50,6 +50,7 @@ export default function RequestPage() {
     description: 1,
   });
   const [result, setResult] = useState([]);
+  const [approvalThreshold, setApprovalThreshold] = useState([])
 
   const [headerList] = useState(defaultHeaderList);
 
@@ -92,6 +93,11 @@ export default function RequestPage() {
           );
         });
       });
+      CampaignContract(address)
+      .getSummary()
+      .then((result) => {
+        setApprovalThreshold(result[8].toNumber() * result[7].toNumber() / 100 / 1000000)
+      });
   }, [address]);
 
   useEffect(() => {
@@ -119,7 +125,7 @@ export default function RequestPage() {
 
   const renderTableBody = () =>
     result.length > 0 ? (
-      result.map((req) => <RequestItem key={req.id} req={req} />)
+      result.map((req) => <RequestItem key={req.id} req={req} approvalThreshold={approvalThreshold.toString()}/>)
     ) : (
       <Tr>
         <Td colSpan={headerList.length}>

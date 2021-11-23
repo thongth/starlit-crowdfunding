@@ -13,6 +13,8 @@ import {
   SliderThumb,
   Button,
   VStack,
+  useToast,
+  Text
 } from "@chakra-ui/react";
 import { useEffect, useMemo } from "react";
 
@@ -32,7 +34,7 @@ export default function CreateCampaignForm() {
   });
 
   const router = useRouter();
-
+  const toast = useToast()
   useEffect(() => {
     register("threshold");
   }, []);
@@ -53,7 +55,14 @@ export default function CreateCampaignForm() {
             console.log('fail')
           }
         })
-      })
+      }).catch((err) => {
+        toast({
+          title: `${err.error?.message || err.message}`,
+          position: 'bottom',
+          isClosable: true,
+          status: 'error'
+        })
+      });
   };
 
   const thresholdLimit = useMemo(() => 30);
@@ -108,6 +117,7 @@ export default function CreateCampaignForm() {
             name="threshold"
             defaultValue={50}
             render={({ field }) => (
+              <>
               <Slider
                 aria-label="campaign-threshold"
                 id="campaign-threshold"
@@ -120,6 +130,8 @@ export default function CreateCampaignForm() {
                 </SliderTrack>
                 <SliderThumb boxSize={6}>{field.value}</SliderThumb>
               </Slider>
+                <Text>{`${field.value}%`}</Text>
+                </>
             )}
           ></Controller>
           <FormErrorMessage>{errors?.threshold?.message}</FormErrorMessage>

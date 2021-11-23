@@ -13,6 +13,7 @@ import {
   Textarea,
   Button,
   VStack,
+  useToast
 } from "@chakra-ui/react";
 
 import { CampaignContract } from "../../eth/metamask/Campaign";
@@ -21,6 +22,7 @@ import { makeItMillion } from "../../eth/metamask/USDT";
 export default function CreateRequestForm(props) {
   const router = useRouter();
   const { address } = router.query;
+  const toast = useToast()
 
   const [ isCreating, setCreating ] = useState(false)
   const schema = yup.object().shape({
@@ -66,7 +68,14 @@ export default function CreateRequestForm(props) {
             console.log('fail')
           }
         })
-      })
+      }).catch((err) => {
+        toast({
+          title: `${err.error?.message || err.message}`,
+          position: 'bottom',
+          isClosable: true,
+          status: 'error'
+        })
+      });
   };
 
   return (

@@ -45,6 +45,9 @@ export default function CampaignPage(props) {
   const [campaignBalance, setCampaignBalance] = useState(0);
   const [requestNumber, setRequestNumber] = useState(0);
   const [contributorNumber, setContributorNumber] = useState(0);
+  const [campaignName, setCampaignName] = useState('')
+  const [campaignDesc, setCampaignDesc] = useState('')
+  const [threshold, setThreshold] = useState(0)
 
   const breakpoint = useBreakpoint();
 
@@ -57,11 +60,15 @@ export default function CampaignPage(props) {
     CampaignContract(address)
       .getSummary()
       .then((result) => {
+        console.log('campaign', result)
         setManagerAddress(result[4]);
         setMinContrib(divideByMillion(result[0].toNumber()));
         setCampaignBalance(divideByMillion(result[1].toNumber()));
         setRequestNumber(result[2].toNumber());
         setContributorNumber(result[3].toNumber());
+        setCampaignName(result[5])
+        setCampaignDesc(result[6])
+        setThreshold(result[7].toNumber())
       });
   }, [address]);
 
@@ -73,7 +80,7 @@ export default function CampaignPage(props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <VisuallyHidden>Campaign Page: {address}</VisuallyHidden>
-      <Heading size="md">Campaign Information</Heading>
+      <Heading size="md">{`${campaignName} - ${campaignDesc}`}</Heading>
       <SimpleGrid columns={[3, null, 5]} spacing={8}>
         <GridItem colSpan={3}>
           <SimpleGrid columns={[1, null, 1, 2]} spacing="4">
@@ -100,6 +107,11 @@ export default function CampaignPage(props) {
             <InformationBox
               title={campaignBalance}
               subtitle="Balance (USDT)"
+              description=""
+            />
+            <InformationBox
+              title={`${threshold}%`}
+              subtitle="Voting threshold"
               description=""
             />
           </SimpleGrid>
