@@ -139,6 +139,7 @@ contract Campaign {
     mapping(address => uint256) public contributions;
     uint256 public totalContribution; //accumulated contributions, never decrease
     uint256 public currentContribution; //keep track of this contract's USDT tokens
+    uint256 public contributionAtTermination;
     uint256 public approversCount;
     string public name;
     string public description;
@@ -152,12 +153,12 @@ contract Campaign {
 
     // == Modifier ==
     modifier authorization() {
-        require(msg.sender == manager);
+        require(msg.sender == manager, "You are not this project manager.");
         _;
     }
 
     modifier Terminable() {
-        require(!terminated);
+        require(!terminated, "The project has been terminated.");
         _;
     }
 
@@ -265,22 +266,23 @@ contract Campaign {
         request.approvalAmount += contributions[msg.sender];
 
         if (request.approvalAmount > ((totalContribution * 2) / 3)) {
+            contributionAtTermination = currentContribution;
             terminated = true;
             request.complete = true;
         }
     }
 
-    function withDrawAfterTeminated() public {
+    function withdrawAfterTeminated() public {
         require(terminated, "The project hasn't terminated yet.");
-        require(approvers[msg.sender], "You are not a contributor!");
-        uint256 tempContribution = currentContribution;
+        require(approvers[msg.sender], "You are not a contributor/already withdrew the fund!");
         uint256 contribution = contributions[msg.sender];
-        uint256 refundAmount = (contribution / totalContribution) *
-            tempContribution;
+        uint256 refundAmount = (contribution / totalContribution) * contributionAtTermination;
 
         if (refundAmount <= currentContribution) {
             usdt.transfer(msg.sender, refundAmount);
             currentContribution -= refundAmount;
+            approvers[msg.sender] = false;
+            emit TransferToken(msg.sender, refundAmount);
         }
     }
 
