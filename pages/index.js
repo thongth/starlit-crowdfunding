@@ -14,7 +14,7 @@ import FilterSearch from "../components/search/FilterSearch";
 //   { ssr: false }
 // )
 
-import { FactoryContract } from "../eth/metamask/Campaign";
+import { FactoryContract, CampaignContract } from "../eth/metamask/Campaign";
 import { connectWallet } from "../eth/metamask";
 
 export default function Home() {
@@ -27,21 +27,35 @@ export default function Home() {
     console.log(FactoryContract());
     FactoryContract()
       .getDeployedCampaigns()
-      .then((result) => {
-        console.log(result);
-        setCampaign(result);
+      .then((addresses) => {
+        console.log('address', addresses);
+        Promise.all(
+          addresses
+            .map((address, index) => {
+              return CampaignContract(address).name();
+            })
+        ).then((names) => {
+          setCampaign(
+            names.map((name, idx) => {
+              return {
+                address: addresses[idx],
+                name: name
+              }
+            })
+          );
+        });
       });
   }, []);
 
   const renderCampaignList = () => {
     const result = campaign.filter(
-      (c) => query === "" || c.address.indexOf(query) !== -1
+      (c) => query === "" || c.address.indexOf(query) !== -1 || c.name.indexOf(query) !== -1
     );
     if (result.length > 0)
       return (
         <SimpleGrid columns={[1, null, null, 2]} spacing="4">
           {result.map((c) => (
-            <CampaignCard key={c} address={c} />
+            <CampaignCard key={c.address} address={c.address} name={c.name} />
           ))}
         </SimpleGrid>
       );
