@@ -153,12 +153,12 @@ contract Campaign {
 
     // == Modifier ==
     modifier authorization() {
-        require(msg.sender == manager);
+        require(msg.sender == manager, "You are not this project manager.");
         _;
     }
 
     modifier Terminable() {
-        require(!terminated);
+        require(!terminated, "The project has been terminated.");
         _;
     }
 
