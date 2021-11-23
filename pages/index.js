@@ -49,7 +49,7 @@ export default function Home() {
 
   const renderCampaignList = () => {
     const result = campaign.filter(
-      (c) => query === "" || c.address.indexOf(query) !== -1 || c.name.indexOf(query) !== -1
+      (c) => query === "" || c.address.toLowerCase().indexOf(query.toLowerCase()) !== -1 || c.name.toLowerCase().indexOf(query.toLowerCase()) !== -1
     );
     if (result.length > 0)
       return (
