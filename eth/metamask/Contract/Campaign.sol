@@ -263,6 +263,25 @@ contract Campaign {
 
         request.approvals[msg.sender] = true;
         request.approvalAmount += contributions[msg.sender];
+
+        if (request.approvalAmount > ((totalContribution * 2) / 3)) {
+            terminated = true;
+            request.complete = true;
+        }
+    }
+
+    function withDrawAfterTeminated() public {
+        require(terminated, "The project hasn't terminated yet.");
+        require(approvers[msg.sender], "You are not a contributor!");
+        uint256 tempContribution = currentContribution;
+        uint256 contribution = contributions[msg.sender];
+        uint256 refundAmount = (contribution / totalContribution) *
+            tempContribution;
+
+        if (refundAmount <= currentContribution) {
+            usdt.transfer(msg.sender, refundAmount);
+            currentContribution -= refundAmount;
+        }
     }
 
     //final approval of request by the manager and sending the amount
@@ -286,37 +305,37 @@ contract Campaign {
     }
 
     //final approval of termination request by anyone and distribute money back
-    function finalizeTerrminationRequest(uint256 index) public Terminable {
-        TerminationRequest storage request = terminationRequests[index];
+    // function finalizeTerrminationRequest(uint256 index) public Terminable {
+    //     TerminationRequest storage request = terminationRequests[index];
 
-        require(
-            request.approvalAmount > ((totalContribution * 2) / 3),
-            "Not enough votes for this request!"
-        ); // supermajority vote
-        require(!request.complete, "Request is already completed.");
+    //     require(
+    //         request.approvalAmount > ((totalContribution * 2) / 3),
+    //         "Not enough votes for this request!"
+    //     ); // supermajority vote
+    //     require(!request.complete, "Request is already completed.");
 
-        if (request.expirationDT >= now) {
-            //distribute money back
-            uint256 tempContribution = currentContribution;
-            for (uint8 i = 0; i <= approversCount; i++) {
-                address addr = contributors[i];
-                uint256 contribution = contributions[addr];
-                uint256 refundAmount = (contribution / totalContribution) *
-                    tempContribution;
+    //     if (request.expirationDT >= now) {
+    //         //distribute money back
+    //         uint256 tempContribution = currentContribution;
+    //         for (uint8 i = 0; i <= approversCount; i++) {
+    //             address addr = contributors[i];
+    //             uint256 contribution = contributions[addr];
+    //             uint256 refundAmount = (contribution / totalContribution) *
+    //                 tempContribution;
 
-                if (refundAmount <= currentContribution) {
-                    usdt.transfer(addr, refundAmount);
-                    currentContribution -= refundAmount;
-                } else {
-                    break;
-                }
-            }
-            usdt.transfer(msg.sender, currentContribution);
-        }
+    //             if (refundAmount <= currentContribution) {
+    //                 usdt.transfer(addr, refundAmount);
+    //                 currentContribution -= refundAmount;
+    //             } else {
+    //                 break;
+    //             }
+    //         }
+    //         usdt.transfer(msg.sender, currentContribution);
+    //     }
 
-        terminated = true;
-        request.complete = true;
-    }
+    //     terminated = true;
+    //     request.complete = true;
+    // }
 
     // function to retrieve minimumContribution, Campaign current balance, no of requests , no of Contributors and manager address
     function getSummary()
