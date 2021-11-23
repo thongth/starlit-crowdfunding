@@ -26,8 +26,6 @@ import ErrorAlert from "../../../../components/alert/ErrorAlert";
 import { CampaignContract } from "../../../../eth/metamask/Campaign";
 import { divideByMillion } from "../../../../eth/metamask/USDT";
 
-import { ErrorContext } from "../../../../context/error-context";
-
 const defaultHeaderList = [
   "ID",
   "Description",
@@ -47,18 +45,16 @@ export default function RequestPage() {
   const [query, setQuery] = useState("");
   const [requestList, setRequestList] = useState([]);
   const [filters] = useState({
+    recipient: 1,
     description: 1,
   });
   const [result, setResult] = useState([]);
-  const [approvalThreshold, setApprovalThreshold] = useState([])
+  const [approvalThreshold, setApprovalThreshold] = useState([]);
 
   const [headerList] = useState(defaultHeaderList);
 
   // Ether State
   const [, setRequestCount] = useState(0);
-
-  // Error State
-  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!address) return;
@@ -93,10 +89,12 @@ export default function RequestPage() {
           );
         });
       });
-      CampaignContract(address)
+    CampaignContract(address)
       .getSummary()
       .then((result) => {
-        setApprovalThreshold(result[8].toNumber() * result[7].toNumber() / 100 / 1000000)
+        setApprovalThreshold(
+          (result[8].toNumber() * result[7].toNumber()) / 100 / 1000000
+        );
       });
   }, [address]);
 
@@ -107,8 +105,8 @@ export default function RequestPage() {
       setResult(
         requestList.filter((item) =>
           Object.keys(filters)
-            .map((key) => `${item[key]}`.indexOf(query) >= 0)
-            .reduce((prev, cur) => prev && cur)
+            .map((key) => `${item[key]}`.toLowerCase().indexOf(query) >= 0)
+            .reduce((prev, cur) => prev || cur)
         )
       );
     }
@@ -125,7 +123,13 @@ export default function RequestPage() {
 
   const renderTableBody = () =>
     result.length > 0 ? (
-      result.map((req) => <RequestItem key={req.id} req={req} approvalThreshold={approvalThreshold.toString()}/>)
+      result.map((req) => (
+        <RequestItem
+          key={req.id}
+          req={req}
+          approvalThreshold={approvalThreshold.toString()}
+        />
+      ))
     ) : (
       <Tr>
         <Td colSpan={headerList.length}>
@@ -138,34 +142,37 @@ export default function RequestPage() {
 
   return (
     <>
-      <ErrorContext.Provider value={{ error, setError }}>
-        <ErrorAlert />
-        <Flex>
-          <NextLink href={{ pathname: "request/new", query: { address } }}>
-            <Button colorScheme="teal" ml="auto">
-              Create <AddIcon ml={2} />
-            </Button>
-          </NextLink>
-        </Flex>
-        <Box my={4}>
-          <InputGroup>
-            <Input
-              placeholder="Search by Description..."
-              onChange={(e) => setQuery(e.target.value)}
-            />
-            <InputAddon children={<Text>Requests</Text>} />
-            <InputRightAddon children={<SearchIcon />} />
-          </InputGroup>
-        </Box>
-        {/* Table */}
-        <Table variant="simple" size="sm">
-          <TableCaption>Requests of The Campaign</TableCaption>
-          <Thead>
-            <Tr>{renderTableHeader()}</Tr>
-          </Thead>
-          <Tbody>{renderTableBody()}</Tbody>
-        </Table>
-      </ErrorContext.Provider>
+      <ErrorAlert />
+      <Flex>
+        <NextLink
+          href={{ pathname: "/campaign/[address]", query: { address } }}
+        >
+          <Button>Go back to Campaign</Button>
+        </NextLink>
+        <NextLink href={{ pathname: "request/new", query: { address } }}>
+          <Button colorScheme="teal" ml="auto">
+            Create <AddIcon ml={2} />
+          </Button>
+        </NextLink>
+      </Flex>
+      <Box my={4}>
+        <InputGroup>
+          <Input
+            placeholder="Search by Description..."
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          <InputAddon children={<Text>Requests</Text>} />
+          <InputRightAddon children={<SearchIcon />} />
+        </InputGroup>
+      </Box>
+      {/* Table */}
+      <Table variant="simple" size="sm">
+        <TableCaption>Requests of The Campaign</TableCaption>
+        <Thead>
+          <Tr>{renderTableHeader()}</Tr>
+        </Thead>
+        <Tbody>{renderTableBody()}</Tbody>
+      </Table>
     </>
   );
 }
