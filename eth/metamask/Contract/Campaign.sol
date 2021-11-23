@@ -272,15 +272,16 @@ contract Campaign {
         }
     }
 
-    function withDrawAfterTeminated() public {
+    function withdrawAfterTeminated() public {
         require(terminated, "The project hasn't terminated yet.");
-        require(approvers[msg.sender], "You are not a contributor!");
+        require(approvers[msg.sender], "You are not a contributor/already withdrew the fund!");
         uint256 contribution = contributions[msg.sender];
         uint256 refundAmount = (contribution / totalContribution) * contributionAtTermination;
 
         if (refundAmount <= currentContribution) {
             usdt.transfer(msg.sender, refundAmount);
             currentContribution -= refundAmount;
+            approvers[msg.sender] = false;
             emit TransferToken(msg.sender, refundAmount);
         }
     }
