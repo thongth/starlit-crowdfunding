@@ -82,7 +82,7 @@ export default function RequestPage() {
                 description: request[0],
                 amount: divideByMillion(request[1].toNumber()),
                 recipient: request[2],
-                exp: new Date(request[5].toNumber()*1000).toLocaleString(),
+                exp: new Date(request[5].toNumber()).toLocaleString(),
                 approval: divideByMillion(request[4].toNumber()),
                 approved: false,
                 completed: request[3],
