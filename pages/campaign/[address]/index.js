@@ -116,7 +116,10 @@ export default function CampaignPage(props) {
             />
           </SimpleGrid>
           <NextLink href={`${address}/request`}>
-            <Button mt={4}>View Request</Button>
+            <Button mt={4} mr={4}>View Requests</Button>
+          </NextLink>
+          <NextLink href={`${address}/termination`}>
+            <Button mt={4}>View Terminations</Button>
           </NextLink>
         </GridItem>
         <GridItem colSpan={["sm"].includes(breakpoint) ? 3 : 2}>

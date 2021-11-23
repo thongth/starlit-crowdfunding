@@ -3,7 +3,7 @@ import Head from "next/head";
 
 import { Box, Heading } from "@chakra-ui/react";
 
-import CreateRequestForm from "../../../../components/forms/CreateRequestForm";
+import CreateTerminationForm from "../../../../components/forms/CreateTerminationForm";
 
 const CreateTerminationPage = () => {
   const router = useRouter();
@@ -20,7 +20,7 @@ const CreateTerminationPage = () => {
         Termination Request: Campaign {address}
       </Heading>
       <Box>
-        <CreateRequestForm />
+        <CreateTerminationForm />
       </Box>
     </>
   );

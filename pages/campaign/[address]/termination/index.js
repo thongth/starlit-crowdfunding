@@ -20,7 +20,7 @@ import {
 import { AddIcon, SearchIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
 
-import RequestItem from "../../../../components/RequestItem";
+import TerminationRequestItem from "../../../../components/TerminationRequestItem";
 import ErrorAlert from "../../../../components/alert/ErrorAlert";
 
 import { CampaignContract } from "../../../../eth/metamask/Campaign";
@@ -31,12 +31,10 @@ import { ErrorContext } from "../../../../context/error-context";
 const defaultHeaderList = [
   "ID",
   "Description",
-  "Amount (USDT)",
-  "Recipient",
   "Approval",
   "Expire Date",
   "Approve",
-  "Finalize",
+  "Claim",
 ];
 
 export default function RequestPage() {
@@ -63,7 +61,7 @@ export default function RequestPage() {
   useEffect(() => {
     if (!address) return;
     CampaignContract(address)
-      .getRequestsCount()
+      .getTerminationRequestsCount()
       .then((result) => {
         const requestCount = result.toNumber();
         setRequestCount(requestCount);
@@ -71,7 +69,7 @@ export default function RequestPage() {
           Array(parseInt(requestCount))
             .fill()
             .map((element, index) => {
-              return CampaignContract(address).requests(index);
+              return CampaignContract(address).terminationRequests(index);
             })
         ).then((requestList) => {
           console.log("request lislt", requestList);
@@ -80,12 +78,9 @@ export default function RequestPage() {
               const aRequest = {
                 id: idx,
                 description: request[0],
-                amount: divideByMillion(request[1].toNumber()),
-                recipient: request[2],
-                exp: new Date(request[5].toNumber()).toLocaleString(),
-                approval: divideByMillion(request[4].toNumber()),
-                approved: false,
-                completed: request[3],
+                exp: new Date(request[3].toNumber()*1000).toLocaleString(),
+                approval: divideByMillion(request[2].toNumber()),
+                completed: request[1],
               };
               console.log(aRequest);
               return aRequest;
@@ -96,7 +91,7 @@ export default function RequestPage() {
       CampaignContract(address)
       .getSummary()
       .then((result) => {
-        setApprovalThreshold(result[8].toNumber() * result[7].toNumber() / 100 / 1000000)
+        setApprovalThreshold(result[8].toNumber() * 2 / 3 / 1000000)
       });
   }, [address]);
 
@@ -125,7 +120,7 @@ export default function RequestPage() {
 
   const renderTableBody = () =>
     result.length > 0 ? (
-      result.map((req) => <RequestItem key={req.id} req={req} approvalThreshold={approvalThreshold.toString()}/>)
+      result.map((req) => <TerminationRequestItem key={req.id} req={req} approvalThreshold={approvalThreshold.toString()}/>)
     ) : (
       <Tr>
         <Td colSpan={headerList.length}>
@@ -141,9 +136,9 @@ export default function RequestPage() {
       <ErrorContext.Provider value={{ error, setError }}>
         <ErrorAlert />
         <Flex>
-          <NextLink href={{ pathname: "request/new", query: { address } }}>
+          <NextLink href={{ pathname: "termination/new", query: { address } }}>
             <Button colorScheme="teal" ml="auto">
-              Create <AddIcon ml={2} />
+              Request termination <AddIcon ml={2} />
             </Button>
           </NextLink>
         </Flex>
@@ -153,13 +148,13 @@ export default function RequestPage() {
               placeholder="Search by Description..."
               onChange={(e) => setQuery(e.target.value)}
             />
-            <InputAddon children={<Text>Requests</Text>} />
+            <InputAddon children={<Text>Terminations</Text>} />
             <InputRightAddon children={<SearchIcon />} />
           </InputGroup>
         </Box>
         {/* Table */}
         <Table variant="simple" size="sm">
-          <TableCaption>Requests of The Campaign</TableCaption>
+          <TableCaption>Termination requests</TableCaption>
           <Thead>
             <Tr>{renderTableHeader()}</Tr>
           </Thead>
