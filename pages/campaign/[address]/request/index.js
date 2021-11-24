@@ -66,21 +66,24 @@ export default function RequestPage() {
         Promise.all(
           Array(parseInt(requestCount))
             .fill()
-            .map((element, index) => {
-              return CampaignContract(address).requests(index);
+            .map((_, index) => {
+              return Promise.all([
+                CampaignContract(address).requests(index),
+                CampaignContract(address).isApprove(index),
+              ]);
             })
         ).then((requestList) => {
           console.log("request lislt", requestList);
           setRequestList(
-            requestList.map((request, idx) => {
+            requestList.map(([request, approved], idx) => {
               const aRequest = {
                 id: idx,
                 description: request[0],
                 amount: divideByMillion(request[1].toNumber()),
                 recipient: request[2],
-                exp: new Date(request[5].toNumber()*1000).toLocaleString(),
+                exp: new Date(request[5].toNumber() * 1000).toLocaleString(),
                 approval: divideByMillion(request[4].toNumber()),
-                approved: false,
+                approved: approved,
                 completed: request[3],
               };
               console.log(aRequest);
@@ -105,7 +108,10 @@ export default function RequestPage() {
       setResult(
         requestList.filter((item) =>
           Object.keys(filters)
-            .map((key) => `${item[key]}`.toLowerCase().indexOf(query.toLowerCase()) >= 0)
+            .map(
+              (key) =>
+                `${item[key]}`.toLowerCase().indexOf(query.toLowerCase()) >= 0
+            )
             .reduce((prev, cur) => prev || cur)
         )
       );
