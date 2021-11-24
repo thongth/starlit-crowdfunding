@@ -105,7 +105,7 @@ export default function RequestPage() {
       setResult(
         requestList.filter((item) =>
           Object.keys(filters)
-            .map((key) => `${item[key]}`.toLowerCase().indexOf(query) >= 0)
+            .map((key) => `${item[key]}`.toLowerCase().indexOf(query.toLowerCase()) >= 0)
             .reduce((prev, cur) => prev || cur)
         )
       );

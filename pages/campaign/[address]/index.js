@@ -17,6 +17,7 @@ import {
   Grid,
   GridItem,
   useBreakpoint,
+  Tag
 } from "@chakra-ui/react";
 
 import ContributeForm from "../../../components/forms/ContributeForm";
@@ -48,6 +49,7 @@ export default function CampaignPage(props) {
   const [campaignName, setCampaignName] = useState('')
   const [campaignDesc, setCampaignDesc] = useState('')
   const [threshold, setThreshold] = useState(0)
+  const [terminated, setTerminated] = useState(false)
 
   const breakpoint = useBreakpoint();
 
@@ -69,6 +71,7 @@ export default function CampaignPage(props) {
         setCampaignName(result[5])
         setCampaignDesc(result[6])
         setThreshold(result[7].toNumber())
+        setTerminated(result[9])
       });
   }, [address]);
 
@@ -80,6 +83,9 @@ export default function CampaignPage(props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <VisuallyHidden>Campaign Page: {address}</VisuallyHidden>
+      {terminated && 
+      <Tag size="md" variant="solid" colorScheme="red">Terminated</Tag>
+      }
       <Heading size="md">{`${campaignName} - ${campaignDesc}`}</Heading>
       <SimpleGrid columns={[3, null, 5]} spacing={8}>
         <GridItem colSpan={3}>
@@ -116,14 +122,14 @@ export default function CampaignPage(props) {
             />
           </SimpleGrid>
           <NextLink href={`${address}/request`}>
-            <Button mt={4} mr={4}>View Requests</Button>
+            <Button mt={4} mr={4} disabled={terminated}>View Requests</Button>
           </NextLink>
           <NextLink href={`${address}/termination`}>
             <Button mt={4}>View Terminations</Button>
           </NextLink>
         </GridItem>
         <GridItem colSpan={["sm"].includes(breakpoint) ? 3 : 2}>
-          <ContributeForm contractAddress={address} />
+          <ContributeForm contractAddress={address} terminated={terminated} />
         </GridItem>
       </SimpleGrid>
     </>

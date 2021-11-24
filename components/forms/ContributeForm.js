@@ -16,7 +16,7 @@ import {
 import { makeItMillion, USDTContract } from "../../eth/metamask/USDT";
 import { CampaignContract } from "../../eth/metamask/Campaign";
 
-const ContributeForm = ({ contractAddress }) => {
+const ContributeForm = ({ contractAddress, terminated=false }) => {
   const [isApproved, setApproved] = useState(false);
   const [isApproving, setApproving] = useState(false);
   const [isContributing, setContributing] = useState(false);
@@ -91,6 +91,7 @@ const ContributeForm = ({ contractAddress }) => {
           </FormLabel>
           <InputGroup>
             <Input
+              disabled={terminated}
               type="number"
               id="contributed-amount"
               autoComplete="off"
@@ -106,6 +107,7 @@ const ContributeForm = ({ contractAddress }) => {
           </FormErrorMessage>
         </FormControl>
         <Button
+          disabled={terminated}
           type="submit"
           isLoading={isSubmitting || isApproving || isContributing}
           mt={4}

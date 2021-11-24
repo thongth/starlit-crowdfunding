@@ -225,11 +225,7 @@ contract Campaign {
         requests.push(newReq);
     }
 
-    function createTerminationRequest(string _description)
-        public
-        authorization
-        Terminable
-    {
+    function createTerminationRequest(string _description) public Terminable {
         TerminationRequest memory newReq = TerminationRequest({
             description: _description,
             complete: false,
@@ -272,15 +268,15 @@ contract Campaign {
         }
     }
 
-    function withdrawAfterTeminated() public {
+    function withdrawAfterTerminated() public {
         require(terminated, "The project hasn't terminated yet.");
         require(
             approvers[msg.sender],
             "You are not a contributor/already withdrew the fund!"
         );
         uint256 contribution = contributions[msg.sender];
-        uint256 refundAmount = (contribution / totalContribution) *
-            contributionAtTermination;
+        uint256 refundAmount = (contribution * contributionAtTermination) /
+            totalContribution;
 
         if (refundAmount <= currentContribution) {
             usdt.transfer(msg.sender, refundAmount);
@@ -356,7 +352,8 @@ contract Campaign {
             string,
             string,
             uint256,
-            uint256
+            uint256,
+            bool
         )
     {
         return (
@@ -368,7 +365,8 @@ contract Campaign {
             name,
             description,
             votingThreshold,
-            totalContribution
+            totalContribution,
+            terminated
         );
     }
 

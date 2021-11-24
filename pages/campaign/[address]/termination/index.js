@@ -136,6 +136,11 @@ export default function RequestPage() {
       <ErrorContext.Provider value={{ error, setError }}>
         <ErrorAlert />
         <Flex>
+        <NextLink
+          href={{ pathname: "/campaign/[address]", query: { address } }}
+        >
+          <Button>Go back to Campaign</Button>
+        </NextLink>
           <NextLink href={{ pathname: "termination/new", query: { address } }}>
             <Button colorScheme="teal" ml="auto">
               Request termination <AddIcon ml={2} />

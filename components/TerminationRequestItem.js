@@ -41,7 +41,7 @@ const RequestItem = ({ req, approvalThreshold="" }) => {
 
   const onFinalize = () => {
     CampaignContract(address)
-      .withdrawAfterTeminated()
+      .withdrawAfterTerminated()
       .then((result) => {
         console.log("withdrawed", result);
         setFinalizing(true)
