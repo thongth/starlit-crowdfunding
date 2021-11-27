@@ -93,6 +93,7 @@ const RequestItem = ({ req, approvalThreshold="" }) => {
       <Td>
         <Button
         isLoading={isFinalizing}
+        disabled={!req.completed}
           colorScheme="blue"
           variant="outline"
           onClick={onFinalize}
