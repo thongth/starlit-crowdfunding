@@ -2,6 +2,12 @@
 
 A **full on-chain crowdfunding** platform. Create campaigns and back projects by providing your **Stablecoin**. Project owner needs to request for the approval of any budget withdrawal from backers. Backers can also request approval for project termination if it seems suspicious. All of the approvals are determined by voting of the backers weighted by each backer's contribution.
 
+# Prerequisites
+
+1) You need metamask installed in your browswer.
+2) Connect the metamask wallet to the web application when first accessing.
+3) Don't forget to switch to Rinkeby testnet.
+
 
 # How to run
 
