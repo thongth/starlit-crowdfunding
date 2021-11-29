@@ -6,7 +6,7 @@ A **full on-chain crowdfunding** platform. Create campaigns and back projects by
 
 1) You need metamask installed in your browswer.
 2) Connect the metamask wallet to the web application when first accessing.
-3) Don't forget to switch to Rinkeby testnet.
+3) Don't forget to switch to Rinkeby testnet, if nothing shows up, try refreshing once.
 
 
 # How to run
