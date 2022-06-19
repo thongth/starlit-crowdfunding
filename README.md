@@ -1,6 +1,6 @@
 # Starlit Crowdfunding
 
-A **full on-chain crowdfunding** platform. Create campaigns and back projects by providing your **Stablecoin**. Project owner needs to request for the approval of any budget withdrawal from backers. Backers can also request approval for project termination if it seems suspicious. All of the approvals are determined by voting of the backers weighted by each backer's contribution.
+A **Full on-chain crowdfunding** platform. Create campaigns and back projects by providing your **Stablecoin**. Project owner needs to request for the approval of any budget withdrawal from backers. Backers can also request approval for project termination if it seems suspicious. All of the approvals are determined by voting of the backers weighted by each backer's contribution.
 
 # Prerequisites
 
